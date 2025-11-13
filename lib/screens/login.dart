@@ -2,7 +2,6 @@ import 'package:football_news/screens/menu.dart';
 import 'package:flutter/material.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:provider/provider.dart';
-import 'package:football_news/screens/login.dart';
 import 'package:football_news/screens/register.dart';
 
 void main() {
@@ -19,7 +18,7 @@ class LoginApp extends StatelessWidget {
       theme: ThemeData(
         useMaterial3: true,
         colorScheme: ColorScheme.fromSwatch(primarySwatch: Colors.blue)
-            .copyWith(secondary: Colors.blueAccent[400]),
+          .copyWith(secondary: Colors.blueAccent[400]),
       ),
       home: const LoginPage(),
     );
@@ -42,17 +41,17 @@ class _LoginPageState extends State<LoginPage> {
     final request = context.watch<CookieRequest>();
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Login'),
-      ),
-      body: Center(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(16.0),
-          child: Card(
-            elevation: 8,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12.0),
-            ),
+        appBar: AppBar(
+            title: const Text('Login'),
+        ),
+        body: Center(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.all(16.0),
+              child: Card(
+                elevation: 8,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12.0),
+                ),
             child: Padding(
               padding: const EdgeInsets.all(20.0),
               child: Column(
@@ -75,7 +74,7 @@ class _LoginPageState extends State<LoginPage> {
                         borderRadius: BorderRadius.all(Radius.circular(12.0)),
                       ),
                       contentPadding:
-                      EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0),
+                          EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0),
                     ),
                   ),
                   const SizedBox(height: 12.0),
@@ -88,7 +87,7 @@ class _LoginPageState extends State<LoginPage> {
                         borderRadius: BorderRadius.all(Radius.circular(12.0)),
                       ),
                       contentPadding:
-                      EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0),
+                          EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0),
                     ),
                     obscureText: true,
                   ),
@@ -122,7 +121,7 @@ class _LoginPageState extends State<LoginPage> {
                             ..showSnackBar(
                               SnackBar(
                                   content:
-                                  Text("$message Welcome, $uname.")),
+                                      Text("$message Welcome, $uname.")),
                             );
                         }
                       } else {

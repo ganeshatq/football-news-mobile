@@ -8,9 +8,13 @@ class NewsDetailPage extends StatelessWidget {
 
   String _formatDate(DateTime date) {
     // Simple date formatter without intl package
-    final months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-      'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-    return '${date.day} ${months[date.month - 1]} ${date.year}, ${date.hour.toString().padLeft(2, '0')}:${date.minute.toString().padLeft(2, '0')}';
+    final months = [
+      'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+      'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
+    ];
+    return '${date.day} ${months[date.month - 1]} ${date.year}, '
+        '${date.hour.toString().padLeft(2, '0')}:'
+        '${date.minute.toString().padLeft(2, '0')}';
   }
 
   @override
@@ -26,9 +30,9 @@ class NewsDetailPage extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Thumbnail image
-            if (news.thumbnail.isNotEmpty)
+            if (news.thumbnail != null && news.thumbnail!.isNotEmpty)
               Image.network(
-                'http://localhost:8000/proxy-image/?url=${Uri.encodeComponent(news.thumbnail)}',
+                'http://localhost:8000/proxy-image/?url=${Uri.encodeComponent(news.thumbnail!)}',
                 width: double.infinity,
                 height: 250,
                 fit: BoxFit.cover,
@@ -50,7 +54,9 @@ class NewsDetailPage extends StatelessWidget {
                   if (news.isFeatured)
                     Container(
                       padding: const EdgeInsets.symmetric(
-                          horizontal: 12.0, vertical: 6.0),
+                        horizontal: 12.0,
+                        vertical: 6.0,
+                      ),
                       margin: const EdgeInsets.only(bottom: 12.0),
                       decoration: BoxDecoration(
                         color: Colors.amber,
@@ -80,7 +86,9 @@ class NewsDetailPage extends StatelessWidget {
                     children: [
                       Container(
                         padding: const EdgeInsets.symmetric(
-                            horizontal: 10.0, vertical: 4.0),
+                          horizontal: 10.0,
+                          vertical: 4.0,
+                        ),
                         decoration: BoxDecoration(
                           color: Colors.indigo.shade100,
                           borderRadius: BorderRadius.circular(12.0),
@@ -109,7 +117,11 @@ class NewsDetailPage extends StatelessWidget {
                   // Views count
                   Row(
                     children: [
-                      Icon(Icons.visibility, size: 16, color: Colors.grey[600]),
+                      Icon(
+                        Icons.visibility,
+                        size: 16,
+                        color: Colors.grey[600],
+                      ),
                       const SizedBox(width: 4),
                       Text(
                         '${news.newsViews} views',

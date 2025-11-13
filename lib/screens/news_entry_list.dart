@@ -15,18 +15,17 @@ class NewsEntryListPage extends StatefulWidget {
 
 class _NewsEntryListPageState extends State<NewsEntryListPage> {
   Future<List<NewsEntry>> fetchNews(CookieRequest request) async {
-    // TODO: Replace the URL with your app's URL and don't forget to add a trailing slash (/)!
-    // To connect Android emulator with Django on localhost, use URL http://10.0.2.2/
-    // If you using chrome,  use URL http://localhost:8000
+    // GANTI URL INI SESUAI ENDPOINT JSON DI DJANGO
+    // Jika pakai Flutter Web (Chrome), gunakan localhost
+    // final response = await request.get('http://localhost:8000/football-news/json/');
 
-    final response = await request.get('http://localhost:8000/json/');
+    // Jika pakai emulator Android, gunakan 10.0.2.2
+    final response =
+        await request.get('http://localhost:8000/json/');
 
-    // Decode response to json format
-    var data = response;
-
-    // Convert json data to NewsEntry objects
+    // response sudah berupa List<dynamic> dari CookieRequest
     List<NewsEntry> listNews = [];
-    for (var d in data) {
+    for (var d in response) {
       if (d != null) {
         listNews.add(NewsEntry.fromJson(d));
       }
@@ -37,47 +36,59 @@ class _NewsEntryListPageState extends State<NewsEntryListPage> {
   @override
   Widget build(BuildContext context) {
     final request = context.watch<CookieRequest>();
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('News Entry List'),
       ),
       drawer: const LeftDrawer(),
-      body: FutureBuilder(
+      body: FutureBuilder<List<NewsEntry>>(
         future: fetchNews(request),
-        builder: (context, AsyncSnapshot snapshot) {
-          if (snapshot.data == null) {
+        builder: (context, snapshot) {
+          // 1. Masih loading
+          if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
-          } else {
-            if (!snapshot.hasData) {
-              return const Column(
-                children: [
-                  Text(
-                    'There are no news in football news yet.',
-                    style: TextStyle(fontSize: 20, color: Color(0xff59A5D8)),
-                  ),
-                  SizedBox(height: 8),
-                ],
-              );
-            } else {
-              return ListView.builder(
-                itemCount: snapshot.data!.length,
-                itemBuilder: (_, index) => NewsEntryCard(
-                  news: snapshot.data![index],
-                  onTap: () {
-                    // Navigate to news detail page
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => NewsDetailPage(
-                          news: snapshot.data![index],
-                        ),
-                      ),
-                    );
-                  },
-                ),
-              );
-            }
           }
+
+          // 2. Ada error dari request
+          if (snapshot.hasError) {
+            return Center(
+              child: Text(
+                'Terjadi error saat mengambil data:\n${snapshot.error}',
+                textAlign: TextAlign.center,
+              ),
+            );
+          }
+
+          // 3. Tidak ada data
+          if (!snapshot.hasData || snapshot.data!.isEmpty) {
+            return const Center(
+              child: Text(
+                'There are no news in football news yet.',
+                style: TextStyle(fontSize: 20, color: Color(0xff59A5D8)),
+              ),
+            );
+          }
+
+          // 4. Ada data → tampilkan list
+          final data = snapshot.data!;
+
+          return ListView.builder(
+            itemCount: data.length,
+            itemBuilder: (_, index) => NewsEntryCard(
+              news: data[index],
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => NewsDetailPage(
+                      news: data[index],
+                    ),
+                  ),
+                );
+              },
+            ),
+          );
         },
       ),
     );

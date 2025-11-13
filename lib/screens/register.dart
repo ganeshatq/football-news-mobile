@@ -59,7 +59,7 @@ class _RegisterPageState extends State<RegisterPage> {
                         borderRadius: BorderRadius.all(Radius.circular(12.0)),
                       ),
                       contentPadding:
-                      EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0),
+                          EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0),
                     ),
                     validator: (value) {
                       if (value == null || value.isEmpty) {
@@ -78,7 +78,7 @@ class _RegisterPageState extends State<RegisterPage> {
                         borderRadius: BorderRadius.all(Radius.circular(12.0)),
                       ),
                       contentPadding:
-                      EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0),
+                          EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0),
                     ),
                     obscureText: true,
                     validator: (value) {
@@ -98,7 +98,7 @@ class _RegisterPageState extends State<RegisterPage> {
                         borderRadius: BorderRadius.all(Radius.circular(12.0)),
                       ),
                       contentPadding:
-                      EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0),
+                          EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0),
                     ),
                     obscureText: true,
                     validator: (value) {
@@ -118,7 +118,7 @@ class _RegisterPageState extends State<RegisterPage> {
                       // Check credentials
                       // TODO: Change the URL and don't forget to add trailing slash (/) at the end of URL!
                       // To connect Android emulator with Django on localhost, use URL http://10.0.2.2/
-                      // If you using chrome,  use URL http://localhost:8000
+                      // If you using chrome,  use URL http://localhost:8000       
                       final response = await request.postJson(
                           "http://localhost:8000/auth/register/",
                           jsonEncode({
