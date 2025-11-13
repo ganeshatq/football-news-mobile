@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:football_news/widgets/left_drawer.dart';
+import 'dart:convert';
+import 'package:provider/provider.dart';
+import 'package:pbp_django_auth/pbp_django_auth.dart';
+import 'package:football_news/screens/menu.dart';
 
 class NewsFormPage extends StatefulWidget {
   const NewsFormPage({super.key});
@@ -27,13 +31,15 @@ class _NewsFormPageState extends State<NewsFormPage> {
 
   @override
   Widget build(BuildContext context) {
+    final request = context.watch<CookieRequest>();
+
     return Scaffold(
       appBar: AppBar(
         title: const Center(child: Text('Form Tambah Berita')),
         backgroundColor: Colors.indigo,
         foregroundColor: Colors.white,
       ),
-      drawer: LeftDrawer(),
+      drawer: const LeftDrawer(),
       body: Form(
         key: _formKey,
         child: SingleChildScrollView(
@@ -53,7 +59,7 @@ class _NewsFormPageState extends State<NewsFormPage> {
                   ),
                   onChanged: (String? value) {
                     setState(() {
-                      _title = value!;
+                      _title = value ?? "";
                     });
                   },
                   validator: (String? value) {
@@ -64,6 +70,7 @@ class _NewsFormPageState extends State<NewsFormPage> {
                   },
                 ),
               ),
+
               // === Content ===
               Padding(
                 padding: const EdgeInsets.all(8.0),
@@ -78,7 +85,7 @@ class _NewsFormPageState extends State<NewsFormPage> {
                   ),
                   onChanged: (String? value) {
                     setState(() {
-                      _content = value!;
+                      _content = value ?? "";
                     });
                   },
                   validator: (String? value) {
@@ -104,14 +111,15 @@ class _NewsFormPageState extends State<NewsFormPage> {
                   items: _categories
                       .map(
                         (cat) => DropdownMenuItem(
-                      value: cat,
-                      child: Text(cat[0].toUpperCase() + cat.substring(1)),
-                    ),
-                  )
+                          value: cat,
+                          child:
+                              Text(cat[0].toUpperCase() + cat.substring(1)),
+                        ),
+                      )
                       .toList(),
                   onChanged: (String? newValue) {
                     setState(() {
-                      _category = newValue!;
+                      _category = newValue ?? "update";
                     });
                   },
                 ),
@@ -130,7 +138,7 @@ class _NewsFormPageState extends State<NewsFormPage> {
                   ),
                   onChanged: (String? value) {
                     setState(() {
-                      _thumbnail = value!;
+                      _thumbnail = value ?? "";
                     });
                   },
                 ),
@@ -157,41 +165,66 @@ class _NewsFormPageState extends State<NewsFormPage> {
                   padding: const EdgeInsets.all(8.0),
                   child: ElevatedButton(
                     style: ButtonStyle(
-                      backgroundColor: MaterialStateProperty.all(Colors.indigo),
+                      backgroundColor:
+                          MaterialStateProperty.all(Colors.indigo),
                     ),
-                    onPressed: () {
+                    onPressed: () async {
                       if (_formKey.currentState!.validate()) {
-                        showDialog(
-                          context: context,
-                          builder: (context) {
-                            return AlertDialog(
-                              title: const Text('Berita berhasil disimpan!'),
-                              content: SingleChildScrollView(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text('Judul: $_title'),
-                                    Text('Isi: $_content'),
-                                    Text('Kategori: $_category'),
-                                    Text('Thumbnail: $_thumbnail'),
-                                    Text(
-                                      'Unggulan: ${_isFeatured ? "Ya" : "Tidak"}',
-                                    ),
-                                  ],
+                        // KIRIM DATA KE DJANGO
+                        final response = await request.postJson(
+                          "http://localhost:8000/create-flutter/",
+                          jsonEncode({
+                            "title": _title,
+                            "content": _content,
+                            "thumbnail":
+                                _thumbnail.isEmpty ? null : _thumbnail,
+                            "category": _category,
+                            "is_featured": _isFeatured,
+                          }),
+                        );
+
+                        if (!context.mounted) return;
+
+                        if (response['status'] == 'success') {
+                          // Tampilkan snackbar sukses
+                          ScaffoldMessenger.of(context)
+                            ..hideCurrentSnackBar()
+                            ..showSnackBar(
+                              const SnackBar(
+                                content: Text("News successfully saved!"),
+                              ),
+                            );
+
+                          // Reset form & state
+                          _formKey.currentState!.reset();
+                          setState(() {
+                            _title = "";
+                            _content = "";
+                            _category = "update";
+                            _thumbnail = "";
+                            _isFeatured = false;
+                          });
+
+                          // Kembali ke home/menu
+                          Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => MyHomePage(),
+                            ),
+                          );
+                        } else {
+                          // Kalau gagal, tampilkan pesan error
+                          ScaffoldMessenger.of(context)
+                            ..hideCurrentSnackBar()
+                            ..showSnackBar(
+                              SnackBar(
+                                content: Text(
+                                  response['message'] ??
+                                      "Something went wrong, please try again.",
                                 ),
                               ),
-                              actions: [
-                                TextButton(
-                                  child: const Text('OK'),
-                                  onPressed: () {
-                                    Navigator.pop(context);
-                                  },
-                                ),
-                              ],
                             );
-                          },
-                        );
-                        _formKey.currentState!.reset();
+                        }
                       }
                     },
                     child: const Text(
